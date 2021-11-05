@@ -67,11 +67,11 @@ trait InteractsWithSwooleTable
     protected function bindSwooleTable()
     {
 //        if (!$this->app instanceof ConsoleApp) {
-        $this->app->singleton(SwooleTable::class, function () {
+        app()->singleton(SwooleTable::class, function () {
             return $this->currentTable;
         });
 
-        $this->app->alias(SwooleTable::class, 'swoole.table');
+        app()->alias(SwooleTable::class, 'swoole.table');
 //        }
     }
 }
