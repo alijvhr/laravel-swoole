@@ -252,7 +252,6 @@ trait InteractsWithWebsocket
     {
         $config = $this->container->make('config');
         $parser = $config->get('swoole_websocket.parser');
-        var_dump($config->get('swoole_http.websocket.enabled'));
         if (!$this->isServerWebsocket = $config->get('swoole_http.websocket.enabled')) {
             return;
         }
