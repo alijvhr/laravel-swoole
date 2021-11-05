@@ -4,13 +4,14 @@ namespace SwooleTW\Http\Websocket\Rooms;
 
 use InvalidArgumentException;
 use Swoole\Table;
+use SwooleTW\Http\Table\SwooleTable;
 
 class TableRoom implements RoomContract
 {
     /**
-     * @var array
+     * @var int
      */
-    protected $config;
+    protected $id;
 
     /**
      * @var Table
@@ -19,12 +20,13 @@ class TableRoom implements RoomContract
 
     /**
      * TableRooms constructor.
-     *
-     * @param  array  $config
      */
-    public function __construct(array $config)
+    public function __construct()
     {
-        $this->config = $config;
+        /** @var SwooleTable $table */
+        $table = app('swoole.table');
+        var_dump($table->get('params')->incr('room_id', 'counter'));
+        var_dump($table->get('params')->get('room_id', 'counter'));
     }
 
     /**

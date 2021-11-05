@@ -34,7 +34,16 @@ trait InteractsWithSwooleTable
     protected function registerTables()
     {
         $tables = $this->container->make('config')->get('swoole_http.tables', []);
-
+        $defaults = [
+            'params' => [
+                'size' => 250,
+                'columns' => [
+                    ['name' => 'value', 'type' => Table::TYPE_STRING, 'size' => 4096],
+                    ['name' => 'counter', 'type' => Table::TYPE_INT],
+                ]
+            ],
+        ];
+        $tables = array_merge($defaults, $tables);
         foreach ($tables as $key => $value) {
             $table = new Table($value['size']);
             $columns = $value['columns'] ?? [];
@@ -56,7 +65,7 @@ trait InteractsWithSwooleTable
      */
     protected function bindSwooleTable()
     {
-        if (! $this->app instanceof ConsoleApp) {
+        if (!$this->app instanceof ConsoleApp) {
             $this->app->singleton(SwooleTable::class, function () {
                 return $this->currentTable;
             });

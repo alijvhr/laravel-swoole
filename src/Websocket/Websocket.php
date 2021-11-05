@@ -64,12 +64,6 @@ class Websocket
      */
     protected $pipeline;
 
-    /**
-     * Room adapter.
-     *
-     * @var \SwooleTW\Http\Websocket\Rooms\RoomContract
-     */
-    protected $room;
 
     /**
      * DI Container.
@@ -81,12 +75,10 @@ class Websocket
     /**
      * Websocket constructor.
      *
-     * @param  \SwooleTW\Http\Websocket\Rooms\RoomContract  $room
      * @param  \Illuminate\Contracts\Pipeline\Pipeline  $pipeline
      */
-    public function __construct(RoomContract $room, PipelineContract $pipeline)
+    public function __construct(PipelineContract $pipeline)
     {
-        $this->room = $room;
         $this->setPipeline($pipeline);
         $this->setDefaultMiddleware();
     }

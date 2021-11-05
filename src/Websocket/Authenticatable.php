@@ -46,7 +46,7 @@ trait Authenticatable
         /** @var Table $table */
         $table = App::make('swoole.table')->get('online_users');
         $table->set($this->sender, ['id' => $user->getAuthIdentifier(), 'fd' => $this->sender]);
-        return true;
+        return $this;
     }
 
     /**
@@ -69,10 +69,12 @@ trait Authenticatable
     public function logout()
     {
         if (is_null($userId = $this->getUserId())) {
-            return null;
+            return;
         }
-
-        return $this->leave(static::USER_PREFIX.$userId);
+        /** @var Table $table */
+        $table = App::make('swoole.table')->get('online_users');
+        $table->del($this->sender);
+        //TODO: unsubscribe all rooms
     }
 
     /**
@@ -122,6 +124,7 @@ trait Authenticatable
         if (isset($this->fds[$this->sender])) {
             return $this->fds[$this->sender];
         }
+        /** @var Table $table */
         $table = App::make('swoole.table')->get('online_users');
         return $table->get($this->sender)['id'];
     }
@@ -142,9 +145,11 @@ trait Authenticatable
      *
      * @return bool
      */
-    public function isUserIdOnline($userId)
+    public function isUserOnline($userId)
     {
-        return !empty($this->room->getClients(static::USER_PREFIX.$userId));
+        /** @var Table $table */
+        $table = App::make('swoole.table')->get('online_users');
+        return $table->exists($this->sender);
     }
 
     /**
