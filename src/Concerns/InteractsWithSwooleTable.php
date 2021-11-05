@@ -24,6 +24,7 @@ trait InteractsWithSwooleTable
      */
     protected function createTables()
     {
+        $this->bindSwooleTable();
         $this->currentTable = new SwooleTable;
         $this->registerTables();
     }

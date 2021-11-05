@@ -322,7 +322,6 @@ class Manager
     protected function bindToLaravelApp()
     {
         $this->bindSandbox();
-        $this->bindSwooleTable();
 
         if ($this->isServerWebsocket) {
             $this->bindRoom();
