@@ -252,7 +252,7 @@ trait InteractsWithWebsocket
     {
         $config = $this->container->make('config');
         $parser = $config->get('swoole_websocket.parser');
-
+        var_dump($config->get('swoole_http.websocket.enabled'));
         if (!$this->isServerWebsocket = $config->get('swoole_http.websocket.enabled')) {
             return;
         }
@@ -309,7 +309,6 @@ trait InteractsWithWebsocket
         $this->websocketRoom = $config->get("swoole_websocket.drivers.{$driver}");
         /** @var SwooleTable $table */
         $table = app('swoole.table');
-        var_dump('fffffrf');
         $table->get('params')->set('room_id', ['value' => 0, 'counter' => 0]);
         var_dump($table->get('params')->incr('room_id', 'counter'));
         var_dump($table->get('params')->get('room_id', 'counter'));
