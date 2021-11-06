@@ -3,6 +3,7 @@
 namespace SwooleTW\Http\Concerns;
 
 use Illuminate\Contracts\Console\Application as ConsoleApp;
+use Illuminate\Support\Facades\App;
 use Swoole\Table;
 use SwooleTW\Http\Table\SwooleTable;
 
@@ -24,8 +25,8 @@ trait InteractsWithSwooleTable
      */
     protected function createTables()
     {
-        $this->bindSwooleTable();
         $this->currentTable = new SwooleTable;
+        $this->bindSwooleTable();
         $this->registerTables();
     }
 
@@ -67,11 +68,11 @@ trait InteractsWithSwooleTable
     protected function bindSwooleTable()
     {
 //        if (!$this->app instanceof ConsoleApp) {
-        app()->singleton(SwooleTable::class, function () {
+        App::singleton(SwooleTable::class, function () {
             return $this->currentTable;
         });
 
-        app()->alias(SwooleTable::class, 'swoole.table');
+        App::alias(SwooleTable::class, 'swoole.table');
 //        }
     }
 }
