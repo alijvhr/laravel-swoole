@@ -19,32 +19,25 @@ interface RoomContract
     public const DESCRIPTORS_KEY = 'fds';
 
     /**
-     * Do some init stuffs before workers started.
+     * Add a socket fd to a room.
      *
-     * @return \SwooleTW\Http\Websocket\Rooms\RoomContract
+     * @param  int fd
+     * @param  int  $userIdId
      */
-    public function prepare(): RoomContract;
+    public function subscribe(int $fd, int $userIdId);
 
     /**
-     * Add multiple socket fds to a room.
+     * Delete a socket fd from a room.
      *
-     * @param int fd
-     * @param string room
+     * @param  int fd
+     * @param  int  $userId
      */
-    public function subscribe(int $fd, string $room);
-
-    /**
-     * Delete multiple socket fds from a room.
-     *
-     * @param int fd
-     * @param string room
-     */
-    public function unsubscribe(int $fd, string $room);
+    public function unsubscribe(int $fd);
 
     /**
      * Get all sockets by a room key.
      *
-     * @param string room
+     * @param  string room
      *
      * @return array
      */
@@ -53,7 +46,7 @@ interface RoomContract
     /**
      * Get all rooms by a fd.
      *
-     * @param int fd
+     * @param  int fd
      *
      * @return array
      */

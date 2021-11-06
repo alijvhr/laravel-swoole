@@ -324,7 +324,6 @@ class Manager
         $this->bindSandbox();
 
         if ($this->isServerWebsocket) {
-            $this->bindRoom();
             $this->bindWebsocket();
         }
     }

@@ -8,92 +8,58 @@ use SwooleTW\Http\Table\SwooleTable;
 
 class TableRoom implements RoomContract
 {
-    /**
-     * @var int
-     */
-    protected $id;
 
     /**
      * @var Table
      */
-    protected Table $fds, $rooms, $online_users;
+    protected Table $rooms, $params;
+    /**
+     * @var int[]
+     */
+    protected array $subscribers = [];
 
     /**
      * TableRooms constructor.
      */
-    public function __construct()
+    public function __construct(protected int $id)
+    {
+    }
+
+    public function restore()
+    {
+        $this->connectTables();
+    }
+
+    private function connectTables()
     {
         /** @var SwooleTable $table */
         $table = app('swoole.table');
-        var_dump($table->get('params')->incr('room_id', 'counter'));
-        var_dump($table->get('params')->get('room_id', 'counter'));
+        $this->rooms = $table->get('rooms');
+        $this->params = $table->get('params');
     }
 
     /**
-     * Do some init stuffs before workers started.
+     * Add a socket fd to current room.
      *
-     * @return RoomContract
+     * @param  int  $fd
+     * @param  int  $userId
+     *
      */
-    public function prepare(): RoomContract
+    public function subscribe(int $fd, int $userId)
     {
-        $this->initRoomsTable();
-        $this->initFdsTable();
-
-        return $this;
+        $this->subscribers[$fd] = $userId;
+        $fds = array_keys($this->subscribers);
+        $this->rooms->set($this->id, ['subscribers' => implode($fds)]);
     }
 
     /**
-     * Add a socket fd to multiple rooms.
+     * Delete a socket fd from current room.
      *
-     * @param  int fd
-     * @param  array|string rooms
-     */
-    public function subscribe(int $fd, $room)
-    {
-        $rooms = $this->getRooms($fd);
-        $roomNames = is_array($roomNames) ? $roomNames : [$roomNames];
-
-        foreach ($roomNames as $room) {
-            $fds = $this->getClients($room);
-
-            if (in_array($fd, $fds)) {
-                continue;
-            }
-
-            $fds[] = $fd;
-            $rooms[] = $room;
-
-            $this->setClients($room, $fds);
-        }
-
-        $this->setRooms($fd, $rooms);
-    }
-
-    /**
-     * Delete a socket fd from multiple rooms.
+     * @param  int  $fd
      *
-     * @param  int fd
-     * @param  array|string rooms
      */
-    public function unsubscribe(int $fd, $roomNames = [])
+    public function unsubscribe(int $fd)
     {
-        $allRooms = $this->getRooms($fd);
-        $roomNames = is_array($roomNames) ? $roomNames : [$roomNames];
-        $rooms = count($roomNames) ? $roomNames : $allRooms;
-
-        $removeRooms = [];
-        foreach ($rooms as $room) {
-            $fds = $this->getClients($room);
-
-            if (!in_array($fd, $fds)) {
-                continue;
-            }
-
-            $this->setClients($room, array_values(array_diff($fds, [$fd])));
-            $removeRooms[] = $room;
-        }
-
-        $this->setRooms($fd, array_values(array_diff($allRooms, $removeRooms)));
     }
 
     /**

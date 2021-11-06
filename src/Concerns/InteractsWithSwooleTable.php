@@ -44,6 +44,16 @@ trait InteractsWithSwooleTable
                     ['name' => 'counter', 'type' => Table::TYPE_INT],
                 ]
             ],
+            'rooms' => [
+                'size' => 4096,
+                'columns' => [
+                    ['name' => 'type', 'type' => Table::TYPE_STRING, 'size' => 128],
+                    ['name' => 'worker', 'type' => Table::TYPE_INT],
+                    ['name' => 'params', 'type' => Table::TYPE_STRING, 'size' => 102400],
+                    ['name' => 'subscribers', 'type' => Table::TYPE_STRING, 'size' => 5500],
+                    ['name' => 'subscribers_count', 'type' => Table::TYPE_INT],
+                ]
+            ],
         ];
         $tables = array_merge($defaults, $tables);
         foreach ($tables as $key => $value) {

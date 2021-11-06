@@ -309,10 +309,6 @@ trait InteractsWithWebsocket
         /** @var SwooleTable $table */
         $table = app('swoole.table');
         $table->get('params')->set('room_id', ['value' => 0, 'counter' => 0]);
-        var_dump($table->get('params')->incr('room_id', 'counter'));
-        var_dump($table->get('params')->get('room_id', 'counter'));
-        var_dump($table->get('params')->incr('room_id', 'counter'));
-        var_dump($table->get('params')->get('room_id', 'counter'));
 
 //        $this->websocketRoom = new $className($websocketConfig);
 //        $this->websocketRoom->prepare();
@@ -371,7 +367,7 @@ trait InteractsWithWebsocket
     protected function bindWebsocket()
     {
         $this->app->singleton(Websocket::class, function (Container $app) {
-            return new Websocket($app->make(RoomContract::class), new Pipeline($app));
+            return new Websocket(new Pipeline($app));
         });
 
         $this->app->alias(Websocket::class, 'swoole.websocket');

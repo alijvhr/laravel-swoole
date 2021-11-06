@@ -16,8 +16,8 @@ class SwooleTable
     /**
      * Add a swoole table to existing tables.
      *
-     * @param string $name
-     * @param \Swoole\Table $table
+     * @param  string  $name
+     * @param  \Swoole\Table  $table
      *
      * @return \SwooleTW\Http\Table\SwooleTable
      */
@@ -31,7 +31,7 @@ class SwooleTable
     /**
      * Get a swoole table by its name from existing tables.
      *
-     * @param string $name
+     * @param  string  $name
      *
      * @return \Swoole\Table $table
      */
@@ -53,7 +53,7 @@ class SwooleTable
     /**
      * Dynamically access table.
      *
-     * @param  string $key
+     * @param  string  $key
      *
      * @return table
      */
