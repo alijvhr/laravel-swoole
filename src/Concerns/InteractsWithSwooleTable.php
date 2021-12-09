@@ -25,8 +25,8 @@ trait InteractsWithSwooleTable
      */
     protected function createTables()
     {
-        $this->currentTable = new SwooleTable;
         $this->bindSwooleTable();
+        $this->currentTable = new SwooleTable;
         $this->registerTables();
     }
 
@@ -77,12 +77,13 @@ trait InteractsWithSwooleTable
      */
     protected function bindSwooleTable()
     {
-//        if (!$this->app instanceof ConsoleApp) {
-        $this->app->singleton(SwooleTable::class, function () {
-            return $this->currentTable;
-        });
+        $dest = $this->app?? $this->container;
+        if (!$dest->bound('swoole.table')) {
+            $dest->singleton(SwooleTable::class, function () {
+                return $this->currentTable;
+            });
 
-        $this->app->alias(SwooleTable::class, 'swoole.table');
-//        }
+            $dest->alias(SwooleTable::class, 'swoole.table');
+        }
     }
 }

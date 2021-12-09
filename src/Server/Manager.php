@@ -287,6 +287,8 @@ class Manager
                 // push async task to queue
             } elseif ($this->isAsyncTaskPayload($data)) {
                 (new SwooleTaskJob($this->container, $server, $data, $taskId, $srcWorkerId))->fire();
+            }elseif ($this->isCommandTaskPayload($data)) {
+                (new SwooleTaskJob($this->container, $server, $data, $taskId, $srcWorkerId))->fire();
             }
         } catch (Throwable $e) {
             $this->logServerError($e);
@@ -322,6 +324,7 @@ class Manager
     protected function bindToLaravelApp()
     {
         $this->bindSandbox();
+        $this->bindSwooleTable();
 
         if ($this->isServerWebsocket) {
             $this->bindWebsocket();
@@ -451,6 +454,24 @@ class Manager
      * @return boolean
      */
     protected function isAsyncTaskPayload($payload): bool
+    {
+        $data = json_decode($payload, true);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            return false;
+        }
+
+        return isset($data['job']);
+    }
+
+    /**
+     * Indicates if the payload is async task.
+     *
+     * @param  mixed  $payload
+     *
+     * @return boolean
+     */
+    protected function isCommandTaskPayload($payload): bool
     {
         $data = json_decode($payload, true);
 

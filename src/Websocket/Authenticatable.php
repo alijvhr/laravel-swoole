@@ -63,8 +63,7 @@ trait Authenticatable
 
     /**
      * Logout with current sender's fd.
-     *
-     * @return mixed
+
      */
     public function logout()
     {
@@ -72,7 +71,7 @@ trait Authenticatable
             return;
         }
         /** @var Table $table */
-        $table = App::make('swoole.table')->get('online_users');
+        $table = app('swoole.table')->get('online_users');
         $table->del($this->sender);
         //TODO: unsubscribe all rooms
     }
@@ -125,8 +124,8 @@ trait Authenticatable
             return $this->fds[$this->sender];
         }
         /** @var Table $table */
-        $table = App::make('swoole.table')->get('online_users');
-        return $table->get($this->sender)['id'];
+        $table = app('swoole.table')->get('online_users');
+        return $table->get($this->sender)['id']?? null;
     }
 
     /**

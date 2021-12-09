@@ -40,11 +40,6 @@ class SwooleTaskJob extends Job implements JobContract
     protected $srcWrokerId;
 
     /**
-     * @var int
-     */
-    protected $srcWorkderId;
-
-    /**
      * Create a new job instance.
      *
      * @param \Illuminate\Contracts\Container\Container $container
@@ -59,7 +54,7 @@ class SwooleTaskJob extends Job implements JobContract
         $this->swoole = $swoole;
         $this->job = $job;
         $this->taskId = $taskId;
-        $this->srcWorkderId = $srcWrokerId;
+        $this->srcWrokerId = $srcWrokerId;
     }
 
     /**
