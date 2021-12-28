@@ -80,9 +80,9 @@ class Manager
     /**
      * HTTP server manager constructor.
      *
-     * @param  Container  $container
-     * @param  string  $framework
-     * @param  string|null  $basePath
+     * @param Container $container
+     * @param string $framework
+     * @param string|null $basePath
      *
      * @throws Exception
      */
@@ -169,7 +169,7 @@ class Manager
     /**
      * "onWorkerStart" listener.
      *
-     * @param  \Swoole\Http\Server|mixed  $server
+     * @param \Swoole\Http\Server|mixed $server
      *
      * @throws Exception
      */
@@ -200,8 +200,8 @@ class Manager
     /**
      * "onRequest" listener.
      *
-     * @param  \Swoole\Http\Request  $swooleRequest
-     * @param  \Swoole\Http\Response  $swooleResponse
+     * @param \Swoole\Http\Request $swooleRequest
+     * @param \Swoole\Http\Response $swooleResponse
      */
     public function onRequest($swooleRequest, $swooleResponse)
     {
@@ -263,10 +263,10 @@ class Manager
     /**
      * Set onTask listener.
      *
-     * @param  mixed  $server
-     * @param  string|Task  $taskId  or $task
-     * @param  string|null  $srcWorkerId
-     * @param  mixed|null  $data
+     * @param mixed $server
+     * @param string|Task $taskId or $task
+     * @param string|null $srcWorkerId
+     * @param mixed|null $data
      */
     public function onTask($server, $task, $srcWorkerId = null, $data = null)
     {
@@ -287,8 +287,6 @@ class Manager
                 // push async task to queue
             } elseif ($this->isAsyncTaskPayload($data)) {
                 (new SwooleTaskJob($this->container, $server, $data, $taskId, $srcWorkerId))->fire();
-            }elseif ($this->isCommandTaskPayload($data)) {
-                (new SwooleTaskJob($this->container, $server, $data, $taskId, $srcWorkerId))->fire();
             }
         } catch (Throwable $e) {
             $this->logServerError($e);
@@ -298,9 +296,9 @@ class Manager
     /**
      * Set onFinish listener.
      *
-     * @param  mixed  $server
-     * @param  string  $taskId
-     * @param  mixed  $data
+     * @param mixed $server
+     * @param string $taskId
+     * @param mixed $data
      */
     public function onFinish($server, $taskId, $data)
     {
@@ -381,7 +379,7 @@ class Manager
     /**
      * Add process to http server
      *
-     * @param  Process  $process
+     * @param Process $process
      */
     public function addProcess(Process $process): void
     {
@@ -401,7 +399,7 @@ class Manager
     /**
      * Log server error.
      *
-     * @param  Throwable|Exception  $e
+     * @param Throwable|Exception $e
      */
     public function logServerError(Throwable $e)
     {
@@ -420,7 +418,7 @@ class Manager
     /**
      * Normalize a throwable/exception to exception.
      *
-     * @param  Throwable|Exception  $e
+     * @param Throwable|Exception $e
      */
     protected function normalizeException(Throwable $e)
     {
@@ -449,12 +447,13 @@ class Manager
     /**
      * Indicates if the payload is async task.
      *
-     * @param  mixed  $payload
+     * @param mixed $payload
      *
      * @return boolean
      */
     protected function isAsyncTaskPayload($payload): bool
     {
+        if (!is_string($payload)) return false;
         $data = json_decode($payload, true);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
@@ -467,7 +466,7 @@ class Manager
     /**
      * Indicates if the payload is async task.
      *
-     * @param  mixed  $payload
+     * @param mixed $payload
      *
      * @return boolean
      */
