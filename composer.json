@@ -26,7 +26,9 @@
     "illuminate/contracts": "*",
     "illuminate/http": "*",
     "illuminate/support": "*",
-    "predis/predis": "*"
+    "predis/predis": "*",
+    "sparrow-team/laravel-setting-module": "dev-master",
+    "": ""
   },
   "require-dev": {
     "laravel/lumen-framework": "*",
@@ -69,5 +71,11 @@
     "post-autoload-dump": [
       "@php copy_versioned_files.php"
     ]
-  }
+  },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://git.devnow.ir/Sparrow/laravel-setting-module"
+    }
+  ]
 }

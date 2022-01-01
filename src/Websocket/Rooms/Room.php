@@ -4,22 +4,31 @@ namespace SwooleTW\Http\Websocket\Rooms;
 
 use ArrayObject;
 use Illuminate\Contracts\Support\Arrayable;
-use JsonSerializable;
+use Sparrow\Setting\Models\Setting;
 use Swoole\Table;
+use SwooleTW\Http\Websocket\Facades\Websocket;
 
-class Room implements Arrayable, JsonSerializable
+abstract class Room implements Arrayable, \JsonSerializable
 {
+
     protected ArrayObject $params;
 
-    private Table $rooms, $onlineUsers, $roomFds;
+    protected array $subscribers = [];
 
-    public function __construct(public int $id, public ?int $limit)
+    protected array $users = [];
+
+    public function __construct(protected array $props = [])
     {
-        /** @var $tables Table */
-        $tables = app('swoole.table');
-        $this->rooms = $tables->get('rooms');
-        $this->onlineUsers = $tables->get('online_users');
-        $this->roomFds = $tables->get('room_fds');
+
+    }
+
+    public static function create(array $options = []): RoomConnection
+    {
+        $id = Setting::incr('sparrow.room_id');
+        $name = static::class;
+        $connection = new RoomConnection($options['room_id']);
+        app('swoole.server')->task(['roomController.createRoom', [$id, $name, $options]], $connection->worker);
+        return $connection;
     }
 
     public function get($filter): array
@@ -55,62 +64,37 @@ class Room implements Arrayable, JsonSerializable
         }
     }
 
-    public function join(int $user, ?int $fd): bool
+    public function join(int $userId): bool
     {
-        if ($this->params['status'] == 'waiting') {
-            $userIndex = count($this->users);
-            $status = $userIndex >= $this->limit - 1 ? 'waiting' : 'active';
-            $this->set(['params.status' => $status, "users.$userIndex" => $user]);
-            if ($fd) {
-                $this->subscribe($user, $fd);
-            }
+        $user = app('sparrow-user')->find($userId);
+        $joinPermission = is_callable([$this, 'onJoin']) && $this->onJoin($userId);
+        if (!isset($this->users[$userId]) && $joinPermission) {
+            $this->set(["users.$userId" => $user]);
             return true;
         }
         return false;
     }
 
-    public function _subscribe(int $user, $fd): bool
+    public function subscribe(int $user, int $fd): bool
     {
-        $isJoined = in_array($user, (array)$this->users);
-        if (!$this->id || !$isJoined) {
-            return false;
+        if (is_callable([$this, 'onSubscribe'])) $this->onSubscribe($user);
+        if (!isset($this->subscribers[$fd])) {
+            $this->subscribers[$fd] = $user;
         }
-        $isSubscribed = in_array($fd, (array)$this->fds);
-        if ($isSubscribed) {
-            return true;
-        }
-        $fds = [];
-        if ($this->onlineUsers->exists($user)) {
-            $onlineUser = $this->onlineUsers->get($user);
-            if ($onlineUser['room'] > 0 && $onlineUser['room'] != $this->id) {
-                return false;
-            }
-            $fds = json_decode($onlineUser['fds'], true);
-        }
-        $this->_fds[] = $fds;
-        $this->roomFds->set($fd, ['room' => $this->id, 'user' => $user]);
-        $fds[] = $fd;
-        $this->onlineUsers->set($user, ['room' => $isJoined ? $this->id : 0, 'fds' => json_encode($fds)]);
         return true;
     }
 
-    public function subscribe(int $user, int $fd): bool
+    public function send(int $user, $event, $data = []): void
     {
-        return $this->_subscribe($user, $fd);
+        if (isset($this->users[$user])) {
+            app('swoole.websocket')->to($this->users[$user])->emit($event, $data);
+        }
     }
 
     public function broadcast(string $event, $data = []): void
     {
-        if ($this->fds) {
-            app(Websocket::class)->to($this->fds)->emit($event, $data);
-        }
+        app('swoole.websocket')->to(array_keys($this->subscribers))->emit($event, $data);
     }
-
-    public function getAll(): Table
-    {
-        return $this->rooms;
-    }
-
 
     public function toArray()
     {

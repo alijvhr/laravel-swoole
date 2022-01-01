@@ -462,22 +462,4 @@ class Manager
 
         return isset($data['job']);
     }
-
-    /**
-     * Indicates if the payload is async task.
-     *
-     * @param mixed $payload
-     *
-     * @return boolean
-     */
-    protected function isCommandTaskPayload($payload): bool
-    {
-        $data = json_decode($payload, true);
-
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            return false;
-        }
-
-        return isset($data['job']);
-    }
 }
