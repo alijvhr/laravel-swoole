@@ -2,14 +2,11 @@
 
 namespace SwooleTW\Http\Websocket\Rooms;
 
-use ArrayObject;
-use Illuminate\Contracts\Support\Arrayable;
-use Sparrow\Setting\Models\Setting;
-use Swoole\Table;
+use SwooleTW\Http\Controllers\RoomController;
 
 class RoomConnection
 {
-    public int $worker;
+    protected int $worker;
 
     public function __construct(protected $id)
     {
@@ -18,6 +15,22 @@ class RoomConnection
 
     public function __call(string $name, array $arguments)
     {
-        app('swoole.server')->task(['roomController.call', [$this->id, $name, $arguments]], $this->worker);
+        app('swoole.server')->task(['method' => RoomController::class . '@call', 'data' => [$this->id, $name, $arguments]], $this->getWorker());
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWorker(): int
+    {
+        return $this->worker;
     }
 }

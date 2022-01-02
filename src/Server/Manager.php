@@ -279,12 +279,13 @@ class Manager
         }
 
         $this->container->make('events')->dispatch('swoole.task', func_get_args());
-
         try {
             // push websocket message
             if ($this->isWebsocketPushPayload($data)) {
                 $this->pushMessage($server, $data['data']);
                 // push async task to queue
+            } elseif ($this->isMethodCallPayload($data)) {
+                $this->container->call($data['method'], $data['data']);
             } elseif ($this->isAsyncTaskPayload($data)) {
                 (new SwooleTaskJob($this->container, $server, $data, $taskId, $srcWorkerId))->fire();
             }
@@ -461,5 +462,19 @@ class Manager
         }
 
         return isset($data['job']);
+    }
+
+    /**
+     * Indicates if the payload is controller method call.
+     *
+     * @param mixed $payload
+     *
+     * @return boolean
+     */
+    protected function isMethodCallPayload($payload): bool
+    {
+        if (is_string($payload)) return false;
+
+        return isset($payload['method']);
     }
 }

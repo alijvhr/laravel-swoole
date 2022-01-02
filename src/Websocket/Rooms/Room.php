@@ -6,9 +6,10 @@ use ArrayObject;
 use Illuminate\Contracts\Support\Arrayable;
 use Sparrow\Setting\Models\Setting;
 use Swoole\Table;
+use SwooleTW\Http\Controllers\RoomController;
 use SwooleTW\Http\Websocket\Facades\Websocket;
 
-abstract class Room implements Arrayable, \JsonSerializable
+class Room implements Arrayable, \JsonSerializable
 {
 
     protected ArrayObject $params;
@@ -17,17 +18,20 @@ abstract class Room implements Arrayable, \JsonSerializable
 
     protected array $users = [];
 
-    public function __construct(protected array $props = [])
+    public function __construct(public array $props = [])
     {
-
+        var_dump('---------IN Room--------');
+        var_dump($props);
+        var_dump(app('swoole.server')->getWorkerId());
+        var_dump('---------IN Room--------');
     }
 
     public static function create(array $options = []): RoomConnection
     {
         $id = Setting::incr('sparrow.room_id');
         $name = static::class;
-        $connection = new RoomConnection($options['room_id']);
-        app('swoole.server')->task(['roomController.createRoom', [$id, $name, $options]], $connection->worker);
+        $connection = new RoomConnection($id);
+        app('swoole.server')->task(['method' => RoomController::class.'@createRoom', 'data' => ['id'=>$id, 'options'=>$options, 'room'=>$name]], $connection->getWorker());
         return $connection;
     }
 

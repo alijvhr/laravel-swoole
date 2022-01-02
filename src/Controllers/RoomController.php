@@ -9,7 +9,7 @@ class RoomController
 
     public function createRoom(int $id, array $options, string $room = 'Room')
     {
-        $this->rooms[$id] = app()->make($room, [$options]);
+        $this->rooms[$id] = app()->make($room, ['props' => $options]);
     }
 
     public function call(int $id, string $method, array $arguments)
