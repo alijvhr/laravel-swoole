@@ -4,6 +4,9 @@ namespace SwooleTW\Http\Websocket\Rooms;
 
 use SwooleTW\Http\Controllers\RoomController;
 
+/**
+ * @method create(int $id, array $options, string $room)
+ */
 class RoomConnection
 {
     protected int $worker;
@@ -13,15 +16,16 @@ class RoomConnection
         $this->worker = $this->id % config('swoole_http.server.options.task_worker_num');
     }
 
-    public function __call(string $name, array $arguments)
+    public function __call(string $name, array $arguments): mixed
     {
-        app('swoole.server')->task(['method' => RoomController::class . '@call', 'data' => [$this->id, $name, $arguments]], $this->getWorker());
+        dump($arguments);
+        return app('swoole.server')->taskwait(['method' => RoomController::class . '@' . $name, 'data' => [...$arguments, 'id' => $this->id]], $this->getWorker());
     }
 
     /**
      * @return mixed
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }

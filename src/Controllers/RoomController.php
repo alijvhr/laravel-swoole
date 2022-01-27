@@ -7,16 +7,19 @@ class RoomController
 
     protected array $rooms = [];
 
-    public function createRoom(int $id, array $options, string $room = 'Room')
+    public function create(int $id, array $options, string $room = 'Room')
     {
         $this->rooms[$id] = app()->make($room, ['props' => $options]);
     }
 
-    public function call(int $id, string $method, array $arguments)
+    public function fetch(int $id)
     {
-        if (!isset($this->rooms[$id])) return;
-        $room = $this->rooms[$id];
-        if (is_callable([$room, $method])) $room->$method($arguments);
+        return $this->rooms[$id] ?? null;
+    }
+
+    public function destroy(int $id)
+    {
+        unset($this->rooms[$id]);
     }
 
 }

@@ -31,8 +31,16 @@ class Room implements Arrayable, \JsonSerializable
         $id = Setting::incr('sparrow.room_id');
         $name = static::class;
         $connection = new RoomConnection($id);
-        app('swoole.server')->task(['method' => RoomController::class.'@createRoom', 'data' => ['id'=>$id, 'options'=>$options, 'room'=>$name]], $connection->getWorker());
+        $connection->create(options: $options,room: static::class);
+//        app('swoole.server')->task(['method' => RoomController::class . '@create', 'data' => ['id' => $id, 'options' => $options, 'room' => $name]], $connection->getWorker());
         return $connection;
+    }
+
+    public static function fetch(int $id): RoomConnection
+    {
+        $connection = new RoomConnection($id);
+//        app('swoole.server')->task(['method' => RoomController::class . '@fetch', 'data' => ['id' => $id]], $connection->getWorker());
+        return $connection->fetch();
     }
 
     public function get($filter): array

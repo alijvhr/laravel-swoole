@@ -228,7 +228,6 @@ class Manager
 
             // handle request via laravel/lumen's dispatcher
             $illuminateResponse = $sandbox->run($illuminateRequest);
-
             // send response
             Response::make($illuminateResponse, $swooleResponse, $swooleRequest)->send();
         } catch (Throwable $e) {
@@ -281,17 +280,18 @@ class Manager
         $this->container->make('events')->dispatch('swoole.task', func_get_args());
         try {
             // push websocket message
-            if ($this->isWebsocketPushPayload($data)) {
+            if ($this->isMethodCallPayload($data)) {
+                return $this->container->call($data['method'], $data['data']);
+            } elseif ($this->isWebsocketPushPayload($data)) {
                 $this->pushMessage($server, $data['data']);
                 // push async task to queue
-            } elseif ($this->isMethodCallPayload($data)) {
-                $this->container->call($data['method'], $data['data']);
             } elseif ($this->isAsyncTaskPayload($data)) {
                 (new SwooleTaskJob($this->container, $server, $data, $taskId, $srcWorkerId))->fire();
             }
         } catch (Throwable $e) {
             $this->logServerError($e);
         }
+        return null;
     }
 
     /**

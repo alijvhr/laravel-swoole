@@ -14,7 +14,7 @@ class StreamedResponse extends BaseStreamedResponse
      *
      * @var string
      */
-    protected $output;
+    public $output;
 
     /**
      * Get output buffer

@@ -308,10 +308,7 @@ trait InteractsWithWebsocket
         $this->websocketRoom = $config->get("swoole_websocket.drivers.{$driver}");
         /** @var SwooleTable $table */
         $table = app('swoole.table');
-        $table->get('params')->set('room_id', ['value' => 0, 'counter' => 0]);
-
-//        $this->websocketRoom = new $className($websocketConfig);
-//        $this->websocketRoom->prepare();
+        $table->get('params')->set('room_id', ['value' => '', 'counter' => 0]);
     }
 
     /**
