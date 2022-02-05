@@ -27,7 +27,7 @@
     "illuminate/http": "*",
     "illuminate/support": "*",
     "predis/predis": "*",
-    "sparrow-team/laravel-setting-module": "dev-master",
+    "sparrow-team/laravel-setting-module": "dev-master"
   },
   "require-dev": {
     "laravel/lumen-framework": "*",
