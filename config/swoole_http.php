@@ -83,7 +83,7 @@ return [
     'pre_resolved' => [
         'view', 'files', 'session', 'session.store', 'routes',
         'db', 'db.factory', 'cache', 'cache.store', 'config', 'cookie',
-        'encrypter', 'hash', 'router', 'translator', 'url', 'log', 'auth',
+        'encrypter', 'hash', 'router', 'translator', 'url', 'log',
     ],
 
     /*
@@ -92,7 +92,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'instances' => [
-        //
+        'auth',
     ],
 
     /*
