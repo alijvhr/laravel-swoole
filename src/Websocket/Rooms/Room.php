@@ -23,6 +23,7 @@ class Room implements Arrayable, \JsonSerializable
     public function __construct(public array $props = [])
     {
         var_dump('---------IN Room--------');
+        $this->set(['params.status' => 'idle']);
         var_dump($props);
         var_dump(app('swoole.server')->getWorkerId());
         var_dump('---------IN Room--------');
@@ -33,7 +34,7 @@ class Room implements Arrayable, \JsonSerializable
         $id = Setting::incr('sparrow.room_id');
         $name = static::class;
         $connection = new RoomConnection($id);
-        $connection->create(options: $options,room: static::class);
+        $connection->create(options: $options, room: static::class);
 //        app('swoole.server')->task(['method' => RoomController::class . '@create', 'data' => ['id' => $id, 'options' => $options, 'room' => $name]], $connection->getWorker());
         return $connection;
     }
@@ -89,11 +90,11 @@ class Room implements Arrayable, \JsonSerializable
         return false;
     }
 
-    public function subscribe(int $user, int $fd): bool
+    public function subscribe(int $user_id, int $fd): bool
     {
-        if (is_callable([$this, 'onSubscribe'])) $this->onSubscribe($user);
+        if (is_callable([$this, 'onSubscribe'])) $this->onSubscribe($user_id);
         if (!isset($this->subscribers[$fd])) {
-            $this->subscribers[$fd] = $user;
+            $this->subscribers[$fd] = $user_id;
         }
         return true;
     }
