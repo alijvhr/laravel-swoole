@@ -92,9 +92,18 @@ class Room implements Arrayable, \JsonSerializable
 
     public function subscribe(int $user_id, int $fd): bool
     {
-        if (is_callable([$this, 'onSubscribe'])) $this->onSubscribe($user_id);
+        if (is_callable([$this, 'onSubscribe'])) $this->onSubscribe($user_id, $fd);
         if (!isset($this->subscribers[$fd])) {
             $this->subscribers[$fd] = $user_id;
+        }
+        return true;
+    }
+
+    public function unsubscribe(int $fd): bool
+    {
+        if (is_callable([$this, 'onUnsubscribe'])) $this->onUnsubscribe($fd);
+        if (isset($this->subscribers[$fd])) {
+            unset($this->subscribers[$fd]);
         }
         return true;
     }
