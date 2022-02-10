@@ -20,6 +20,8 @@ trait InteractsWithSwooleTable
      */
     protected $currentTable;
 
+    protected static array $colType = ['string' => Table::TYPE_STRING, 'int' => Table::TYPE_INT, 'float' => Table::TYPE_FLOAT];
+
     /**
      * Register customized swoole talbes.
      */
@@ -61,9 +63,9 @@ trait InteractsWithSwooleTable
             $columns = $value['columns'] ?? [];
             foreach ($columns as $column) {
                 if (isset($column['size'])) {
-                    $table->column($column['name'], $column['type'], $column['size']);
+                    $table->column($column['name'], self::$colType[$column['type']] ?? Table::TYPE_STRING, $column['size']);
                 } else {
-                    $table->column($column['name'], $column['type']);
+                    $table->column($column['name'], self::$colType[$column['type']] ?? Table::TYPE_INT);
                 }
             }
             $table->create();
@@ -77,7 +79,7 @@ trait InteractsWithSwooleTable
      */
     protected function bindSwooleTable()
     {
-        $dest = $this->app?? $this->container;
+        $dest = $this->app ?? $this->container;
         if (!$dest->bound('swoole.table')) {
             $dest->singleton(SwooleTable::class, function () {
                 return $this->currentTable;

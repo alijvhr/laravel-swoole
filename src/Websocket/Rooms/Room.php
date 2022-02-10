@@ -18,6 +18,8 @@ class Room implements Arrayable, \JsonSerializable
 
     protected array $users = [];
 
+    protected int $id;
+
     public function __construct(public array $props = [])
     {
         var_dump('---------IN Room--------');
